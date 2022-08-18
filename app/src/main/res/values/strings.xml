@@ -1,0 +1,13 @@
+<resources>
+    <string name="app_name">Banner Overlay</string>
+    <string name="overlayNext">Next</string>
+    <string name="overlayStart">Start</string>
+    <string name="overlayLoading">Loading…</string>
+    <string name="notificationTitle">Showing banner overlay</string>
+    <string name="notificationChannelTitle">Overlay</string>
+    <string name="notificationAction">Stop</string>
+    <string name="overlayError">Error</string>
+    <string name="overlayEllipsis">…</string>
+    <string name="overlayMinus">−</string>
+    <string name="overlayPlus">+</string>
+</resources>
