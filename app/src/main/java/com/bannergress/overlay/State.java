@@ -34,4 +34,8 @@ public class State {
     State bannerLoaded(Banner banner) {
         return new State(banner, this.currentMission, false);
     }
+
+    State bannerLoaded(Banner banner, int currentMission) {
+        return new State(banner, currentMission, false);
+    }
 }
