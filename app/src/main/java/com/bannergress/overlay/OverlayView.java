@@ -141,7 +141,7 @@ class OverlayView extends FrameLayout {
             int numberOfMissions = state.banner.missions.size();
 
             if (state.currentMission == -1) {
-                textMission.setText(String.valueOf(numberOfMissions));
+                textMission.setText(String.format(Locale.ROOT, "—/%s", numberOfMissions));
                 buttonNext.setText(R.string.overlayStart);
             } else {
                 textMission.setText(String.format(Locale.ROOT, "%s/%s", state.currentMission + 1, numberOfMissions));
