@@ -15,21 +15,15 @@ import android.widget.Toast;
 import androidx.core.os.HandlerCompat;
 
 import com.bannergress.overlay.api.Banner;
+import com.bannergress.overlay.api.BannerApi;
 import com.bannergress.overlay.api.Mission;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.Iterables;
 
-import java.io.IOException;
+import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.ResponseBody;
 
 @SuppressLint("ViewConstructor")
 class OverlayView extends FrameLayout {
@@ -89,33 +83,45 @@ class OverlayView extends FrameLayout {
     private void loadData(String data, Context context) {
         executorService.submit(() -> {
             try {
-                String bannerId = parseBannerId(data);
-                Banner banner = loadBanner(bannerId);
-                HandlerCompat.createAsync(Looper.getMainLooper()).post(() -> applyState(state.bannerLoaded(banner)));
+                SharedDataParser.ParsedData parsedData = SharedDataParser.parse(data);
+                State newState;
+                switch (parsedData.type) {
+                    case mission: {
+                        String missionId = parsedData.id;
+                        List<Banner> banners = BannerApi.findBanners(missionId);
+                        if (banners.size() == 1) {
+                            String bannerId = banners.get(0).id;
+                            Banner banner = BannerApi.getBanner(bannerId);
+                            int currentMission = Iterables.indexOf(banner.missions.values(), mission -> {
+                                assert mission != null;
+                                return mission.id.equals(missionId);
+                            });
+                            newState = state.bannerLoaded(banner, currentMission);
+                        } else {
+                            newState = State.error();
+                        }
+                        break;
+                    }
+                    case banner: {
+                        String bannerId = parsedData.id;
+                        Banner banner = BannerApi.getBanner(bannerId);
+                        newState = state.bannerLoaded(banner);
+                        break;
+                    }
+                    case invalid: {
+                        newState = State.error();
+                        break;
+                    }
+                    default: {
+                        throw new IllegalArgumentException(parsedData.type.toString());
+                    }
+                }
+                HandlerCompat.createAsync(Looper.getMainLooper()).post(() -> applyState(newState));
             } catch (Exception e) {
                 HandlerCompat.createAsync(Looper.getMainLooper()).post(() -> applyState(State.error()));
                 Toast.makeText(context, "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
-    }
-
-    private Banner loadBanner(String missionId) throws IOException {
-        OkHttpClient client = new OkHttpClient.Builder().build();
-        Request request = new Request.Builder().url("https://api.bannergress.com/bnrs/" + missionId).build();
-        ObjectMapper objectMapper = new ObjectMapper();
-        objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-        ResponseBody responseBody = client.newCall(request).execute().body();
-        assert responseBody != null;
-        return objectMapper.readValue(responseBody.string(), Banner.class);
-    }
-
-    private String parseBannerId(String data) {
-        Pattern pattern = Pattern.compile("https://bannergress.com/banner/([^\\s]+)");
-        Matcher matcher = pattern.matcher(data);
-        if (!matcher.find()) {
-            throw new IllegalArgumentException(data);
-        }
-        return matcher.group(1);
     }
 
     private void applyState(State state) {
@@ -138,7 +144,7 @@ class OverlayView extends FrameLayout {
                 textMission.setText(String.valueOf(numberOfMissions));
                 buttonNext.setText(R.string.overlayStart);
             } else {
-                textMission.setText(String.format(Locale.ROOT, "%d/%d", state.currentMission + 1, numberOfMissions));
+                textMission.setText(String.format(Locale.ROOT, "%s/%s", state.currentMission + 1, numberOfMissions));
                 buttonNext.setText(R.string.overlayNext);
             }
 
