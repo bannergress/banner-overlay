@@ -22,5 +22,24 @@ public class SharedDataParserTest {
         SharedDataParser.ParsedData result3 = SharedDataParser.parse(data3);
         assertThat(result3.type, is(SharedDataParser.ParsedDataType.mission));
         assertThat(result3.id, is("edd0df3599e24480bd7b7049fbda3a32.1c"));
+
+        String data4 = "https://bannergress.com/banner/%E5%B1%B1%E8%83%8C%E5%8F%A4%E9%81%93%E3%82%92%E6%AD%A9%E3%81%8F-1304";
+        SharedDataParser.ParsedData result4 = SharedDataParser.parse(data4);
+        assertThat(result4.type, is(SharedDataParser.ParsedDataType.banner));
+        assertThat(result4.id, is("山背古道を歩く-1304"));
+
+        String data5 = "https://bannergress.com/banner/山背古道を歩く-1304";
+        SharedDataParser.ParsedData result5 = SharedDataParser.parse(data5);
+        assertThat(result5.type, is(SharedDataParser.ParsedDataType.banner));
+        assertThat(result5.id, is("山背古道を歩く-1304"));
+
+        String data6 = "https://bannergress.com/banner/md-2022-donostia-ff41?a=b#c";
+        SharedDataParser.ParsedData result6 = SharedDataParser.parse(data6);
+        assertThat(result6.type, is(SharedDataParser.ParsedDataType.banner));
+        assertThat(result6.id, is("md-2022-donostia-ff41"));
+
+        String data7 = "bannergress.com/banner/md-2022-donostia-ff41";
+        SharedDataParser.ParsedData result7 = SharedDataParser.parse(data7);
+        assertThat(result7.type, is(SharedDataParser.ParsedDataType.invalid));
     }
 }
