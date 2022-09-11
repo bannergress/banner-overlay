@@ -9,7 +9,7 @@ android {
         applicationId "com.bannergress.overlay"
         minSdk 26
         targetSdk 32
-        versionCode 5
+        versionCode 6
         versionName "${versionCode}"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
