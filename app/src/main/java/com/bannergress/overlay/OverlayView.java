@@ -3,6 +3,7 @@ package com.bannergress.overlay;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.PixelFormat;
+import android.os.Handler;
 import android.os.Looper;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -27,6 +28,8 @@ import java.util.concurrent.Executors;
 
 @SuppressLint("ViewConstructor")
 class OverlayView extends FrameLayout {
+    public static final int COOLDOWN_MILLIS = 1_000;
+
     private static final ExecutorService executorService = Executors.newFixedThreadPool(1);
     private final WindowManager.LayoutParams params;
     private final TextView textMission;
@@ -67,11 +70,12 @@ class OverlayView extends FrameLayout {
 
     private void setupListeners() {
         buttonMinus.setOnClickListener(v -> applyState(state.previousMission()));
-        buttonPlus.setOnClickListener(v -> applyState(state.nextMission()));
+        buttonPlus.setOnClickListener(v -> applyState(state.nextMission(false)));
         buttonNext.setOnClickListener(v -> {
             Optional<Mission> optionalNextMission = state.banner.missions.values().stream().skip(state.currentMission + 1).findFirst();
             optionalNextMission.ifPresent(nextMission -> Ingress.tryLaunchMission(getContext(), nextMission.id));
-            applyState(state.nextMission());
+            applyState(state.nextMission(true));
+            new Handler().postDelayed(() -> applyState(state.cooldownFinished()), COOLDOWN_MILLIS);
         });
         setOnTouchListener(new ViewMoveListener(this));
     }
@@ -152,7 +156,7 @@ class OverlayView extends FrameLayout {
             boolean hasNext = state.currentMission < numberOfMissions - 1;
             buttonMinus.setEnabled(hasPrevious);
             buttonPlus.setEnabled(hasNext);
-            buttonNext.setEnabled(hasNext);
+            buttonNext.setEnabled(hasNext && !state.cooldown);
         }
     }
 }
