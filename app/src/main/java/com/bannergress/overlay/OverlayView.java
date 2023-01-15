@@ -1,7 +1,9 @@
 package com.bannergress.overlay;
 
 import android.annotation.SuppressLint;
+import android.content.ComponentName;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.PixelFormat;
 import android.os.Handler;
 import android.os.Looper;
@@ -73,9 +75,15 @@ class OverlayView extends FrameLayout {
         buttonPlus.setOnClickListener(v -> applyState(state.nextMission(false)));
         buttonNext.setOnClickListener(v -> {
             Optional<Mission> optionalNextMission = state.banner.missions.values().stream().skip(state.currentMission + 1).findFirst();
-            optionalNextMission.ifPresent(nextMission -> Ingress.tryLaunchMission(getContext(), nextMission.id));
-            applyState(state.nextMission(true));
-            new Handler().postDelayed(() -> applyState(state.cooldownFinished()), COOLDOWN_MILLIS);
+            if (optionalNextMission.isPresent()) {
+                Ingress.tryLaunchMission(getContext(), optionalNextMission.get().id);
+                applyState(state.nextMission(true));
+                new Handler().postDelayed(() -> applyState(state.cooldownFinished()), COOLDOWN_MILLIS);
+            } else {
+                Intent serviceIntent = new Intent();
+                serviceIntent.setComponent(new ComponentName(getContext(), OverlayService.class));
+                getContext().stopService(serviceIntent);
+            }
         });
         setOnTouchListener(new ViewMoveListener(this));
     }
@@ -149,14 +157,18 @@ class OverlayView extends FrameLayout {
                 buttonNext.setText(R.string.overlayStart);
             } else {
                 textMission.setText(String.format(Locale.ROOT, "%s/%s", state.currentMission + 1, numberOfMissions));
-                buttonNext.setText(R.string.overlayNext);
+                if (state.currentMission + 1 == numberOfMissions) {
+                    buttonNext.setText(R.string.overlayClose);
+                } else {
+                    buttonNext.setText(R.string.overlayNext);
+                }
             }
 
             boolean hasPrevious = state.currentMission >= 0;
             boolean hasNext = state.currentMission < numberOfMissions - 1;
             buttonMinus.setEnabled(hasPrevious);
             buttonPlus.setEnabled(hasNext);
-            buttonNext.setEnabled(hasNext && !state.cooldown);
+            buttonNext.setEnabled(!state.cooldown);
         }
     }
 }
