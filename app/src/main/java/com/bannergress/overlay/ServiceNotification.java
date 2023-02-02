@@ -34,11 +34,28 @@ final class ServiceNotification {
                 context.getString(R.string.notificationAction),
                 pendingIntentCancel
         ).build();
-        return new NotificationCompat.Builder(context.getApplicationContext(), CHANNEL_ID)
-                .setContentTitle(context.getString(R.string.app_name))
-                .setContentText(context.getString(R.string.notificationTitle))
+
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(context.getApplicationContext(), CHANNEL_ID);
+        State state = StateManager.getState();
+        if (state.banner == null) {
+            builder
+                    .setContentTitle(context.getString(R.string.app_name))
+                    .setContentText(context.getString(R.string.notificationTitle))
+                    .setProgress(0, 0, false);
+        } else {
+            double totalDistance = DistanceCalculation.getTotalDistance(state.banner);
+            double remainingDistance = DistanceCalculation.getRemainingDistance(state.banner, state.currentMission, state.currentMissionVisitedStepIndexes, state.currentLocation);
+            builder
+                    .setContentTitle(state.banner.title)
+                    .setContentText(context.getString(R.string.notificationRemaining, remainingDistance / 1_000, totalDistance / 1_000))
+                    .setProgress((int) totalDistance, Math.max((int) (totalDistance - remainingDistance), 0), false);
+        }
+        return builder
                 .setSmallIcon(R.drawable.ic_launcher_foreground)
                 .addAction(action)
+                .setOnlyAlertOnce(true)
+                .setAllowSystemGeneratedContextualActions(false)
+                .setOngoing(true)
                 .build();
     }
 }
