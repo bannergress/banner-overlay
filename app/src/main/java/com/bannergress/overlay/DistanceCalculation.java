@@ -38,13 +38,16 @@ public class DistanceCalculation {
     });
 
     public static double getTotalDistance(Banner banner) {
-        return remainingDistanceCache.getUnchecked(banner).get(0).distance;
+        PartialResult partialResult = remainingDistanceCache.getUnchecked(banner).get(0);
+        assert partialResult != null;
+        return partialResult.distance;
     }
 
     public static double getRemainingDistance(Banner banner, int firstMissionIndex, Set<Integer> excludedStepIndexesFromFirstMission, Location currentLocation) {
         PartialResult result = firstMissionIndex < banner.missions.size() - 1
                 ? remainingDistanceCache.getUnchecked(banner).get(firstMissionIndex + 1)
                 : PartialResult.create();
+        assert result != null;
         if (firstMissionIndex >= 0) {
             List<MissionStep> steps = Objects.requireNonNull(banner.missions.get(firstMissionIndex)).steps;
             for (int stepIndex = steps.size() - 1; stepIndex >= 0; stepIndex--) {
@@ -106,5 +109,9 @@ public class DistanceCalculation {
                 return plus(poi.latitude, poi.longitude);
             }
         }
+    }
+
+    static boolean isInRange(MissionStep step, Location location) {
+        return DistanceCalculation.distanceMeters(location.getLatitude(), location.getLongitude(), step.poi.latitude, step.poi.longitude) <= 40;
     }
 }

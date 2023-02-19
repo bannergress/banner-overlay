@@ -15,12 +15,16 @@ public class StateManager {
     }
 
     public static BiConsumer<State, State> addListener(BiConsumer<State, State> listener) {
-        listeners.add(listener);
+        if (listeners.add(listener)) {
+            listener.accept(state, State.initial());
+        }
         return listener;
     }
 
     public static void removeListener(BiConsumer<State, State> listener) {
-        listeners.remove(listener);
+        if (listeners.remove(listener)) {
+            listener.accept(State.terminal(), state);
+        }
     }
 
     public static State getState() {

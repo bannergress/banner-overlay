@@ -6,4 +6,6 @@ public class POI {
     public Double longitude;
 
     public POIType type;
+
+    public String title;
 }

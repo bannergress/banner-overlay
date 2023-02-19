@@ -20,6 +20,7 @@
             android:name=".OverlayService"
             android:foregroundServiceType="location" />
         <receiver android:name=".StopDetectionReceiver" />
+
         <activity
             android:name=".MainActivity"
             android:exported="true"
@@ -30,5 +31,21 @@
                 <data android:mimeType="text/plain" />
             </intent-filter>
         </activity>
+
+        <activity
+            android:name=".SettingsActivity"
+            android:exported="true">
+            <meta-data
+                android:name="android.app.lib_name"
+                android:value="" />
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
     </application>
+
+    <queries>
+        <package android:name="com.nianticproject.ingress" />
+    </queries>
 </manifest>

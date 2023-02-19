@@ -1,0 +1,40 @@
+<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <Preference
+        app:key="introduction"
+        app:persistent="false"
+        app:selectable="false"
+        app:singleLineTitle="false"
+        app:title="@string/preferences_introduction" />
+
+    <PreferenceCategory app:title="@string/preferences_location">
+
+        <SwitchPreferenceCompat
+            app:defaultValue="true"
+            app:key="@string/location_enable"
+            app:persistent="false"
+            app:title="@string/preferences_location_enable" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory app:title="@string/preferences_notifications">
+
+        <SwitchPreferenceCompat
+            app:defaultValue="true"
+            app:key="@string/notifications_enable"
+            app:persistent="false"
+            app:title="@string/preferences_notifications_enable" />
+
+        <Preference
+            app:key="@string/notification_progress"
+            app:persistent="false"
+            app:title="@string/preferences_notification_progress" />
+
+        <Preference
+            app:key="@string/notification_step_in_range"
+            app:persistent="false"
+            app:title="@string/preferences_notification_step_in_range" />
+
+    </PreferenceCategory>
+
+</PreferenceScreen>
