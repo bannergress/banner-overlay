@@ -15,6 +15,17 @@ public class MainActivity extends AppCompatActivity {
 
         webView = findViewById(R.id.webview);
         webView.setWebViewClient(new WebViewClient() {
+
+            @Override
+            public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
+                if (request.getUrl().getScheme().equals("geo")) {
+                    Intent intent = new Intent(Intent.ACTION_VIEW, request.getUrl());
+                    startActivity(intent);
+                    return true;
+                }
+                return super.shouldOverrideUrlLoading(view, request);
+            }
+
             @Override
             public void onPageFinished(WebView view, String url) {
                 super.onPageFinished(view, url);
@@ -26,8 +37,9 @@ public class MainActivity extends AppCompatActivity {
                         "               var addedNode = mutation.addedNodes[0];" +
                         "               if (addedNode.classList && addedNode.classList.contains('banner-info-page')) {" +
                         "                   var button = addedNode.querySelector('.banner-info-button');" +
-                        "                   if (button) { " +
+                        "                   if (button && !document.getElementById('open-overlay-button')) { " +
                         "                       var overlayButton = document.createElement('a');" +
+                        "                       overlayButton.id = 'open-overlay-button';" +
                         "                       overlayButton.innerHTML = 'Open overlay';" +
                         "                       overlayButton.classList.add('banner-info-button');" +
                         "                       overlayButton.onclick = (event) => { " +
