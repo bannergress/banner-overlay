@@ -68,7 +68,21 @@ public class MainActivity extends AppCompatActivity {
         webSettings.setUserAgentString("Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Mobile Safari/537.36");
         webView.addJavascriptInterface(new JavaScriptInterface(), "android");
 
-        webView.loadUrl("https://bannergress.com");
+        handleIntent(getIntent());
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        handleIntent(intent);
+    }
+
+    private void handleIntent(Intent intent) {
+        String url = "https://bannergress.com";
+        if (Intent.ACTION_VIEW.equals(intent.getAction()) && intent.getData() != null) {
+            url = intent.getDataString();
+        }
+        webView.loadUrl(url);
     }
 
     public class JavaScriptInterface {
