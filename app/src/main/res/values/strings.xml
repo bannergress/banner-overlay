@@ -5,10 +5,29 @@
     <string name="overlayStart">Start</string>
     <string name="overlayLoading">Loading…</string>
     <string name="notificationTitle">Showing banner overlay</string>
-    <string name="notificationChannelTitle">Overlay</string>
+    <string name="notificationChannelDefaultTitle">Overlay</string>
+    <string name="notificationChannelStepInRangeTitle">Step(s) in range</string>
     <string name="notificationAction">Stop</string>
+    <string name="notificationRemaining">%1$1.1f km remaining (%2$1.1f km total)</string>
     <string name="overlayError">Error</string>
     <string name="overlayEllipsis">…</string>
     <string name="overlayMinus">−</string>
     <string name="overlayPlus">+</string>
+    <string name="objectiveHack">Hack</string>
+    <string name="objectiveCaptureOrUpgrade">Capture / upgrade</string>
+    <string name="objectiveCreateLink">Create link</string>
+    <string name="objectiveCreateField">Create field</string>
+    <string name="objectiveInstallMod">Install mod</string>
+    <string name="objectiveTakePhoto">Take photo</string>
+    <string name="objectiveViewWaypoint">View waypoint</string>
+    <string name="objectiveEnterPassphrase">Enter passphrase</string>
+
+    <string name="preferences_title">Settings</string>
+    <string name="preferences_introduction">This companion app to Ingress Prime lets you keep an eye on the banner you are currently passing through.\n\nTo start progress tracking, just share a Bannergress banner link with the app.</string>
+    <string name="preferences_location">Location</string>
+    <string name="preferences_location_enable">Use location</string>
+    <string name="preferences_notifications">Notifications</string>
+    <string name="preferences_notifications_enable">Use notifications</string>
+    <string name="preferences_notification_progress">Progress</string>
+    <string name="preferences_notification_step_in_range">Next step in range</string>
 </resources>

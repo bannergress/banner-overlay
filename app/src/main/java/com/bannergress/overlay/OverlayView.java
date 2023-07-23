@@ -27,6 +27,8 @@ import java.util.Locale;
 import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.function.BiConsumer;
+import java.util.function.Function;
 
 @SuppressLint("ViewConstructor")
 class OverlayView extends FrameLayout {
@@ -38,7 +40,7 @@ class OverlayView extends FrameLayout {
     private final Button buttonMinus;
     private final Button buttonNext;
     private final Button buttonPlus;
-    private State state;
+    private BiConsumer<State, State> stateListener;
 
     public OverlayView(Context context, String data) {
         super(context);
@@ -56,7 +58,7 @@ class OverlayView extends FrameLayout {
                 PixelFormat.RGB_888);
         params.gravity = Gravity.START | Gravity.TOP;
         setupListeners();
-        applyState(State.initial());
+        applyState(StateManager.getState());
         loadData(data, context);
     }
 
@@ -71,14 +73,15 @@ class OverlayView extends FrameLayout {
     }
 
     private void setupListeners() {
-        buttonMinus.setOnClickListener(v -> applyState(state.previousMission()));
-        buttonPlus.setOnClickListener(v -> applyState(state.nextMission(false)));
+        stateListener = StateManager.addListener((newState, oldState) -> applyState(newState));
+        buttonMinus.setOnClickListener(v -> StateManager.updateState(State::previousMission));
+        buttonPlus.setOnClickListener(v -> StateManager.updateState(state -> state.nextMission(false)));
         buttonNext.setOnClickListener(v -> {
-            Optional<Mission> optionalNextMission = state.banner.missions.values().stream().skip(state.currentMission + 1).findFirst();
+            Optional<Mission> optionalNextMission = StateManager.getState().banner.missions.values().stream().skip(StateManager.getState().currentMission + 1).findFirst();
             if (optionalNextMission.isPresent()) {
                 Ingress.tryLaunchMission(getContext(), optionalNextMission.get().id);
-                applyState(state.nextMission(true));
-                new Handler().postDelayed(() -> applyState(state.cooldownFinished()), COOLDOWN_MILLIS);
+                StateManager.updateState(state -> state.nextMission(true));
+                new Handler().postDelayed(() -> StateManager.updateState(State::cooldownFinished), COOLDOWN_MILLIS);
             } else {
                 Intent serviceIntent = new Intent();
                 serviceIntent.setComponent(new ComponentName(getContext(), OverlayService.class));
@@ -89,6 +92,7 @@ class OverlayView extends FrameLayout {
     }
 
     public void remove() {
+        StateManager.removeListener(stateListener);
         getContext().getSystemService(WindowManager.class).removeView(this);
     }
 
@@ -96,7 +100,7 @@ class OverlayView extends FrameLayout {
         executorService.submit(() -> {
             try {
                 SharedDataParser.ParsedData parsedData = SharedDataParser.parse(data);
-                State newState;
+                Function<State, State> stateFunction;
                 switch (parsedData.type) {
                     case mission: {
                         String missionId = parsedData.id;
@@ -108,37 +112,35 @@ class OverlayView extends FrameLayout {
                                 assert mission != null;
                                 return mission.id.equals(missionId);
                             });
-                            newState = state.bannerLoaded(banner, currentMission);
+                            stateFunction = state -> state.bannerLoaded(banner, currentMission);
                         } else {
-                            newState = State.error();
+                            stateFunction = state -> State.error();
                         }
                         break;
                     }
                     case banner: {
                         String bannerId = parsedData.id;
                         Banner banner = BannerApi.getBanner(bannerId);
-                        newState = state.bannerLoaded(banner);
+                        stateFunction = state -> state.bannerLoaded(banner);
                         break;
                     }
                     case invalid: {
-                        newState = State.error();
+                        stateFunction = state -> State.error();
                         break;
                     }
                     default: {
                         throw new IllegalArgumentException(parsedData.type.toString());
                     }
                 }
-                HandlerCompat.createAsync(Looper.getMainLooper()).post(() -> applyState(newState));
+                HandlerCompat.createAsync(Looper.getMainLooper()).post(() -> StateManager.updateState(stateFunction));
             } catch (Exception e) {
-                HandlerCompat.createAsync(Looper.getMainLooper()).post(() -> applyState(State.error()));
+                HandlerCompat.createAsync(Looper.getMainLooper()).post(() -> StateManager.updateState(state -> State.error()));
                 Toast.makeText(context, "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
     }
 
     private void applyState(State state) {
-        this.state = state;
-
         if (state.banner == null) {
             if (state.error) {
                 textMission.setText(R.string.overlayError);

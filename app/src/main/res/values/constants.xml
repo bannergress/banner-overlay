@@ -1,0 +1,6 @@
+<resources>
+    <string name="location_enable" translatable="false">location_enable</string>
+    <string name="notifications_enable" translatable="false">notifications_enable</string>
+    <string name="notification_progress" translatable="false">notification_progress</string>
+    <string name="notification_step_in_range" translatable="false">notification_step_in_range</string>
+</resources>
