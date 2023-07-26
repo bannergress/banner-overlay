@@ -3,13 +3,13 @@ plugins {
 }
 
 android {
-    compileSdk 33
+    compileSdk 34
 
     defaultConfig {
         applicationId "com.bannergress.overlay"
         minSdk 26
-        targetSdk 33
-        versionCode 7
+        targetSdk 34
+        versionCode 8
         versionName "${versionCode}"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
