@@ -21,6 +21,7 @@
     <string name="objectiveTakePhoto">Take photo</string>
     <string name="objectiveViewWaypoint">View waypoint</string>
     <string name="objectiveEnterPassphrase">Enter passphrase</string>
+    <string name="clipDataLabel">Mission number</string>
 
     <string name="preferences_title">Settings</string>
     <string name="preferences_introduction">This companion app to Ingress Prime lets you keep an eye on the banner you are currently passing through.\n\nTo start progress tracking, just share a Bannergress banner link with the app.</string>
@@ -30,4 +31,6 @@
     <string name="preferences_notifications_enable">Use notifications</string>
     <string name="preferences_notification_progress">Progress</string>
     <string name="preferences_notification_step_in_range">Next step in range</string>
+    <string name="preferences_clipboard">Clipboard</string>
+    <string name="preferences_clipboard_enable">Copy mission number as passphrase</string>
 </resources>

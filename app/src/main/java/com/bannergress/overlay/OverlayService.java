@@ -70,6 +70,7 @@ public class OverlayService extends Service {
         ServiceNotification.createNotificationChannels(this);
         ServiceNotification.updateDefaultNotification(this, newState);
         ServiceNotification.updateStepReachedNotification(this, newState, oldState);
+        ClipboardHandler.updateClipboard(this, newState, oldState);
     }
 
     private void handleStateLocation(State newState, State oldState) {

@@ -7,9 +7,12 @@ import com.bannergress.overlay.api.Mission;
 import com.bannergress.overlay.api.MissionStep;
 import com.bannergress.overlay.api.MissionType;
 import com.bannergress.overlay.api.POIType;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Sets;
 
 import java.util.List;
+import java.util.Set;
 
 public class State {
     public final Banner banner;
@@ -108,4 +111,21 @@ public class State {
             return builder.build();
         }
     }
+    static ImmutableMap<Integer, MissionStep> getNewStepsInRange(State newState, State oldState) {
+        Set<Integer> newStepsInRange;
+        if (newState.currentMission != oldState.currentMission) {
+            newStepsInRange = newState.currentMissionVisitedStepIndexes;
+        } else {
+            newStepsInRange = Sets.difference(newState.currentMissionVisitedStepIndexes, oldState.currentMissionVisitedStepIndexes);
+        }
+        ImmutableMap.Builder<Integer, MissionStep> result = ImmutableMap.builder();
+        for (int stepIndex : newStepsInRange) {
+            Mission mission = newState.banner.missions.get(newState.currentMission);
+            assert mission != null;
+            MissionStep step = mission.steps.get(stepIndex);
+            result.put(stepIndex, step);
+        }
+        return result.build();
+    }
+
 }
