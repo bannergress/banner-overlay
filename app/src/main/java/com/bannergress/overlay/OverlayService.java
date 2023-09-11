@@ -84,7 +84,7 @@ public class OverlayService extends Service {
         if (locationListener == null && checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             LocationManager locationManager = getSystemService(LocationManager.class);
             locationListener = location -> StateManager.updateState(state -> state.location(location));
-            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
+            locationManager.requestLocationUpdates(LocationManager.FUSED_PROVIDER, 100, 0, locationListener);
         }
     }
 
