@@ -3,4 +3,5 @@
     <string name="notifications_enable" translatable="false">notifications_enable</string>
     <string name="notification_progress" translatable="false">notification_progress</string>
     <string name="notification_step_in_range" translatable="false">notification_step_in_range</string>
+    <string name="clipboard_enable" translatable="false">clipboard_enable</string>
 </resources>

@@ -11,13 +11,11 @@ import android.content.Intent;
 import androidx.annotation.StringRes;
 import androidx.core.app.NotificationCompat;
 
-import com.bannergress.overlay.api.Mission;
 import com.bannergress.overlay.api.MissionStep;
 import com.bannergress.overlay.api.Objective;
 import com.bannergress.overlay.api.POIType;
-import com.google.common.collect.Sets;
 
-import java.util.Set;
+import java.util.Map;
 
 final class ServiceNotification {
     static final String DEFAULT_CHANNEL_ID = "default";
@@ -79,16 +77,10 @@ final class ServiceNotification {
     }
 
     static void updateStepReachedNotification(Context context, State newState, State oldState) {
-        Set<Integer> newStepsInRange;
-        if (newState.currentMission != oldState.currentMission) {
-            newStepsInRange = newState.currentMissionVisitedStepIndexes;
-        } else {
-            newStepsInRange = Sets.difference(newState.currentMissionVisitedStepIndexes, oldState.currentMissionVisitedStepIndexes);
-        }
-        for (int stepIndex : newStepsInRange) {
-            Mission mission = newState.banner.missions.get(newState.currentMission);
-            assert mission != null;
-            MissionStep step = mission.steps.get(stepIndex);
+        Map<Integer, MissionStep> newStepsInRange = State.getNewStepsInRange(newState, oldState);
+        for (Map.Entry<Integer, MissionStep> entry : newStepsInRange.entrySet()) {
+            int stepIndex = entry.getKey();
+            MissionStep step = entry.getValue();
             if (step.poi != null && step.objective != null && step.poi.type != POIType.unavailable) {
                 NotificationManager notificationManager = context.getSystemService(NotificationManager.class);
                 NotificationCompat.Builder builder = new NotificationCompat.Builder(context.getApplicationContext(), STEP_IN_RANGE_CHANNEL_ID)

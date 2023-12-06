@@ -37,4 +37,12 @@
 
     </PreferenceCategory>
 
+    <PreferenceCategory app:title="@string/preferences_clipboard">
+
+        <SwitchPreference
+            app:key="@string/clipboard_enable"
+            app:defaultValue="false"
+            app:title="@string/preferences_clipboard_enable" />
+    </PreferenceCategory>
+
 </PreferenceScreen>
